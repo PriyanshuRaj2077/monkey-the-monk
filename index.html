@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monkey the Monk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface2: #1f1f1f;
+    --surface3: #2a2a2a;
+    --border: #2e2e2e;
+    --border2: #3a3a3a;
+    --text: #f0ede6;
+    --text2: #9a9690;
+    --text3: #5c5955;
+    --accent: #c8f04a;
+    --accent2: #a8d036;
+    --accent-dim: rgba(200,240,74,0.12);
+    --red: #ff5c5c;
+    --red-dim: rgba(255,92,92,0.12);
+    --amber: #f0a832;
+    --amber-dim: rgba(240,168,50,0.12);
+    --blue: #5ca8ff;
+    --blue-dim: rgba(92,168,255,0.12);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+  }
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 4px;
+  }
+  .nav-tab {
+    padding: 7px 18px;
+    border-radius: 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--text2);
+    transition: all 0.18s;
+    letter-spacing: 0.02em;
+  }
+  .nav-tab.active {
+    background: var(--accent);
+    color: #0e0e0e;
+    font-weight: 500;
+  }
+  .nav-tab:hover:not(.active) { color: var(--text); background: var(--surface3); }
+  .header-date {
+    font-size: 12px;
+    color: var(--text3);
+    text-align: right;
+  }
+  .header-date span {
+    display: block;
+    font-size: 14px;
+    color: var(--text2);
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+  .page { display: none; width: 100%; }
+  .page.active { display: flex; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 300px;
+    min-width: 300px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .sidebar-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+  }
+  .add-playlist-btn {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--accent-dim);
+    border: 1px dashed var(--accent);
+    border-radius: var(--radius);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .add-playlist-btn:hover { background: rgba(200,240,74,0.2); }
+
+  .playlist-list { overflow-y: auto; flex: 1; }
+  .playlist-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .playlist-item:hover { background: var(--surface2); }
+  .playlist-item.active { background: var(--surface2); }
+  .playlist-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 0 2px 2px 0;
+  }
+  .playlist-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+  }
+  .playlist-meta {
+    font-size: 11px;
+    color: var(--text3);
+  }
+  .playlist-progress-bar {
+    height: 2px;
+    background: var(--surface3);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .playlist-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+  .del-btn {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .playlist-item:hover .del-btn { opacity: 1; }
+  .del-btn:hover { color: var(--red); }
+
+  /* CONTENT AREA */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 32px;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    width: 480px;
+    max-width: 95vw;
+    position: relative;
+  }
+  .modal h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  .modal-close {
+    position: absolute;
+    right: 20px; top: 20px;
+    background: none; border: none;
+    color: var(--text2);
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--text3); }
+  .form-row { display: flex; gap: 12px; }
+  .form-row .form-group { flex: 1; }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #0e0e0e;
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+  .btn-secondary:hover { background: var(--surface3); color: var(--text); }
+  .btn-danger { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,92,92,0.3); }
+  .btn-danger:hover { background: rgba(255,92,92,0.25); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+
+  /* LOADING STATE */
+  .loading-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--text3);
+    font-size: 13px;
+  }
+  .spinner {
+    width: 24px; height: 24px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+    gap: 16px;
+    text-align: center;
+  }
+  .empty-icon { font-size: 48px; opacity: 0.4; }
+  .empty-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text2); }
+  .empty-desc { font-size: 13px; color: var(--text3); max-width: 300px; line-height: 1.6; }
+
+  /* TODAY PAGE */
+  .today-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .today-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+  }
+  .today-subtitle { font-size: 13px; color: var(--text3); margin-top: 4px; }
+  .today-stats {
+    display: flex;
+    gap: 12px;
+  }
+  .stat-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .stat-pill.done { background: rgba(200,240,74,0.15); color: var(--accent); }
+  .stat-pill.pending { background: var(--amber-dim); color: var(--amber); }
+  .stat-pill.missed { background: var(--red-dim); color: var(--red); }
+
+  .section-head {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+    margin-top: 28px;
+  }
+
+  /* CHECKLIST */
+  .task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .task-card:hover { border-color: var(--border2); }
+  .task-card.done { opacity: 0.55; }
+  .task-card.missed { border-color: rgba(255,92,92,0.25); background: rgba(255,92,92,0.04); }
+
+  .task-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 14px;
+    cursor: pointer;
+  }
+  .task-check {
+    width: 20px; height: 20px; min-width: 20px;
+    border: 1.5px solid var(--border2);
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    font-size: 12px;
+  }
+  .task-card.done .task-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0e0e0e;
+  }
+  .task-card.missed .task-check {
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .task-info { flex: 1; min-width: 0; }
+  .task-name {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text);
+  }
+  .task-card.done .task-name { text-decoration: line-through; color: var(--text3); }
+  .task-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+  .task-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--surface3);
+    color: var(--text3);
+    white-space: nowrap;
+  }
+  .task-link {
+    font-size: 18px;
+    color: var(--text3);
+    text-decoration: none;
+    padding: 4px;
+    transition: color 0.15s;
+  }
+  .task-link:hover { color: var(--accent); }
+
+  /* CALENDAR PAGE */
+  .cal-container {
+    display: flex;
+    gap: 24px;
+    height: 100%;
+  }
+  .cal-left { flex: 1; }
+  .cal-right { width: 320px; }
+
+  .cal-grid {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cal-month {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .cal-nav-btn {
+    background: none; border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .cal-nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .cal-days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cal-day-label {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 4px;
+  }
+  .cal-cells {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 8px 12px 12px;
+    gap: 2px;
+  }
+  .cal-cell {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 13px;
+    gap: 2px;
+    position: relative;
+  }
+  .cal-cell:hover:not(.empty) { background: var(--surface2); }
+  .cal-cell.empty { cursor: default; color: transparent; }
+  .cal-cell.other-month { color: var(--text3); }
+  .cal-cell.today {
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .cal-cell.selected {
+    background: var(--accent);
+    color: #0e0e0e;
+    font-weight: 600;
+  }
+  .cal-cell.has-tasks::after {
+    content: '';
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    position: absolute;
+    bottom: 3px;
+  }
+  .cal-cell.selected.has-tasks::after { background: #0e0e0e; }
+  .cal-cell.has-missed::after { background: var(--red); }
+  .cal-cell.all-done::after { background: var(--accent); }
+
+  .cal-day-detail {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+  }
+  .cal-detail-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+
+  /* GOALS PAGE */
+  .goals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .goal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+  }
+  .goal-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .goal-big-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .goal-big-label { font-size: 12px; color: var(--text3); }
+  .goal-bar {
+    height: 4px;
+    background: var(--surface3);
+    border-radius: 4px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+  .goal-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--accent);
+    transition: width 0.5s;
+  }
+
+  .playlist-detail-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .playlist-detail-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .playlist-thumb {
+    width: 48px; height: 36px;
+    border-radius: 6px;
+    background: var(--surface3);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .playlist-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .playlist-detail-title { font-weight: 600; font-size: 14px; }
+  .playlist-detail-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .playlist-detail-body { padding: 16px 20px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .info-pair .label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
+  .info-pair .val { font-size: 15px; font-weight: 600; }
+  .mini-bar { height: 3px; background: var(--surface3); border-radius: 3px; overflow: hidden; margin-top: 10px; }
+  .mini-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+
+  /* VIDEO LIST */
+  .video-list { overflow: hidden; }
+  .video-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .video-item:last-child { border-bottom: none; }
+  .video-num {
+    width: 22px; height: 22px; min-width: 22px;
+    border-radius: 50%;
+    background: var(--surface3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    color: var(--text3);
+  }
+  .video-num.done-v { background: rgba(200,240,74,0.15); color: var(--accent); }
+  .video-num.missed-v { background: var(--red-dim); color: var(--red); }
+  .video-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text2); }
+  .video-date { font-size: 10px; color: var(--text3); white-space: nowrap; }
+
+  /* TOAST */
+  .toast-container {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    display: flex; flex-direction: column;
+    gap: 8px;
+    z-index: 200;
+  }
+  .toast {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    font-size: 13px;
+    min-width: 240px;
+    animation: slideIn 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  @keyframes slideIn {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  .toast.success { border-color: rgba(200,240,74,0.4); }
+  .toast.error { border-color: rgba(255,92,92,0.4); }
+  .toast-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .toast.success .toast-dot { background: var(--accent); }
+  .toast.error .toast-dot { background: var(--red); }
+
+  /* MISC */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .badge.green { background: rgba(200,240,74,0.12); color: var(--accent); }
+  .badge.amber { background: var(--amber-dim); color: var(--amber); }
+  .badge.red { background: var(--red-dim); color: var(--red); }
+  .badge.blue { background: var(--blue-dim); color: var(--blue); }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .chip.selected { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+  .freq-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .step-dot {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--surface3);
+    color: var(--text3);
+    border: 1.5px solid var(--border2);
+  }
+  .step-dot.active { background: var(--accent); color: #0e0e0e; border-color: var(--accent); }
+  .step-dot.done { background: rgba(200,240,74,0.15); color: var(--accent); border-color: var(--accent); }
+  .step-line { flex: 1; height: 1px; background: var(--border); }
+
+  select.form-input { appearance: none; cursor: pointer; }
+
+  .inline-loader {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border: 1.5px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  .video-schedule-preview {
+    max-height: 180px;
+    overflow-y: auto;
+    margin-top: 12px;
+  }
+  .vsp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .vsp-row:last-child { border-bottom: none; }
+  .vsp-date { color: var(--text3); min-width: 90px; }
+  .vsp-vids { color: var(--text2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .start-date-note { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+  @media (max-width: 900px) {
+    .goals-grid { grid-template-columns: 1fr; }
+    .cal-container { flex-direction: column; }
+    .cal-right { width: 100%; }
+    .sidebar { width: 260px; min-width: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🐒</div>
+    <div>
+      <div class="logo-text">Monkey the Monk</div>
+      <div class="logo-sub">learn. daily.</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchPage('today')">Today</button>
+    <button class="nav-tab" onclick="switchPage('calendar')">Calendar</button>
+    <button class="nav-tab" onclick="switchPage('goals')">Goals</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="btn btn-secondary" onclick="importData()" style="font-size:11px;padding:7px 14px" title="Import backup">⬆ Import</button>
+    <button class="btn btn-secondary" onclick="exportData()" style="font-size:11px;padding:7px 14px" title="Export backup">⬇ Export</button>
+    <div class="header-date">
+      <span id="header-day-name"></span>
+      <span id="header-full-date"></span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TODAY PAGE -->
+  <div class="page active" id="page-today">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Playlists</div>
+        <button class="add-playlist-btn" onclick="openAddModal()">
+          <span style="font-size:16px">+</span> Add Playlist
+        </button>
+      </div>
+      <div class="playlist-list" id="sidebar-playlist-list"></div>
+    </div>
+    <div class="content" id="today-content">
+      <div class="empty-state" id="today-empty">
+        <div class="empty-icon">🐒</div>
+        <div class="empty-title">No tasks yet</div>
+        <div class="empty-desc">Add a YouTube playlist to start building your daily learning schedule.</div>
+        <button class="btn btn-primary" onclick="openAddModal()">Add your first playlist</button>
+      </div>
+      <div id="today-main" style="display:none">
+        <div class="today-header">
+          <div>
+            <div class="today-title">Today's Tasks</div>
+            <div class="today-subtitle" id="today-subtitle"></div>
+          </div>
+          <div class="today-stats" id="today-stats"></div>
+        </div>
+        <div id="today-tasks-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR PAGE -->
+  <div class="page" id="page-calendar">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Playlists</div>
+        <button class="add-playlist-btn" onclick="openAddModal()">
+          <span style="font-size:16px">+</span> Add Playlist
+        </button>
+      </div>
+      <div class="playlist-list" id="cal-sidebar-playlist-list"></div>
+    </div>
+    <div class="content">
+      <div class="cal-container">
+        <div class="cal-left">
+          <div class="cal-grid">
+            <div class="cal-nav">
+              <button class="cal-nav-btn" onclick="changeMonth(-1)">←</button>
+              <div class="cal-month" id="cal-month-label"></div>
+              <button class="cal-nav-btn" onclick="changeMonth(1)">→</button>
+            </div>
+            <div class="cal-days-header">
+              <div class="cal-day-label">Sun</div>
+              <div class="cal-day-label">Mon</div>
+              <div class="cal-day-label">Tue</div>
+              <div class="cal-day-label">Wed</div>
+              <div class="cal-day-label">Thu</div>
+              <div class="cal-day-label">Fri</div>
+              <div class="cal-day-label">Sat</div>
+            </div>
+            <div class="cal-cells" id="cal-cells"></div>
+          </div>
+        </div>
+        <div class="cal-right">
+          <div class="cal-day-detail">
+            <div class="cal-detail-title" id="cal-detail-title">Select a day</div>
+            <div id="cal-detail-tasks">
+              <div style="color:var(--text3);font-size:13px">Click a date to see tasks.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOALS PAGE -->
+  <div class="page" id="page-goals">
+    <div class="content" style="max-width:900px;margin:0 auto">
+      <div style="margin-bottom:28px">
+        <div class="today-title" style="font-family:'Syne',sans-serif;font-weight:800;font-size:24px">Goals & Progress</div>
+        <div class="today-subtitle" style="margin-top:4px;font-size:13px;color:var(--text3)">Based on your playlists</div>
+      </div>
+      <div class="goals-grid" id="goals-summary-grid"></div>
+      <div id="goals-playlist-details"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD PLAYLIST MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAddModal()">✕</button>
+    <h2>Add YouTube Playlist</h2>
+
+    <div class="step-indicator" id="step-indicator">
+      <div class="step-dot active" id="step1-dot">1</div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="step2-dot">2</div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="step3-dot">3</div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="step1">
+      <div class="form-group">
+        <label class="form-label">YouTube Playlist URL</label>
+        <input type="text" class="form-input" id="playlist-url" placeholder="https://www.youtube.com/playlist?list=..." />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="fetchPlaylist()" id="fetch-btn">Fetch Playlist →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step2" style="display:none">
+      <div style="background:var(--surface2);border-radius:var(--radius);padding:14px;margin-bottom:18px;display:flex;gap:12px;align-items:center" id="playlist-preview-box">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Videos per day</label>
+        <div class="freq-selector" id="freq-selector">
+          <div class="chip selected" data-val="1" onclick="selectFreq(this)">1 / day</div>
+          <div class="chip" data-val="2" onclick="selectFreq(this)">2 / day</div>
+          <div class="chip" data-val="3" onclick="selectFreq(this)">3 / day</div>
+          <div class="chip" data-val="5" onclick="selectFreq(this)">5 / day</div>
+          <div class="chip" data-val="custom" onclick="selectFreq(this)">Custom</div>
+        </div>
+        <input type="number" class="form-input" id="custom-freq" placeholder="Enter number" min="1" style="display:none;margin-top:10px" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Start Date</label>
+        <input type="date" class="form-input" id="start-date" />
+        <div class="start-date-note">Videos will be scheduled from this date forward.</div>
+      </div>
+      <div id="schedule-preview-section" style="display:none">
+        <div class="section-head">Schedule preview</div>
+        <div class="video-schedule-preview" id="schedule-preview"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="previewSchedule()">Preview Schedule →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="step3" style="display:none">
+      <div style="background:var(--surface2);border-radius:var(--radius);padding:14px;margin-bottom:18px" id="schedule-summary"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="confirmPlaylist()">Confirm & Schedule ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE FREQUENCY MODAL -->
+<div class="modal-overlay" id="freq-modal">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeFreqModal()">✕</button>
+    <h2>Change Frequency</h2>
+    <div id="freq-modal-playlist-info" style="background:var(--surface2);border-radius:var(--radius);padding:12px;margin-bottom:18px;font-size:13px;color:var(--text2)"></div>
+    <div class="form-group">
+      <label class="form-label">New videos per day</label>
+      <div class="freq-selector" id="freq-modal-chips">
+        <div class="chip" data-val="1" onclick="selectModalFreq(this)">1 / day</div>
+        <div class="chip" data-val="2" onclick="selectModalFreq(this)">2 / day</div>
+        <div class="chip" data-val="3" onclick="selectModalFreq(this)">3 / day</div>
+        <div class="chip" data-val="5" onclick="selectModalFreq(this)">5 / day</div>
+        <div class="chip" data-val="custom" onclick="selectModalFreq(this)">Custom</div>
+      </div>
+      <input type="number" class="form-input" id="freq-modal-custom" placeholder="Enter number" min="1" style="display:none;margin-top:10px" />
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-top:-8px;margin-bottom:16px;line-height:1.6">
+      Already completed videos stay as done. Only remaining (pending) videos will be rescheduled from today forward.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeFreqModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="applyFreqChange()">Apply Change ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- HIDDEN IMPORT INPUT -->
+<input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(event)" />
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// API calls go through /api/youtube (serverless function — key is server-side)
+
+
+// ============================================================
+//  STATE
+// ============================================================
+let state = loadState();
+let calViewDate = new Date();
+let selectedCalDate = null;
+let pendingPlaylist = null;
+let selectedFreq = 1;
+let currentPage = 'today';
+
+// ============================================================
+//  PERSISTENCE
+// ============================================================
+function loadState() {
+  try {
+    const s = localStorage.getItem('mtm_state');
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return { playlists: [], tasks: {}, lastMidnightCheck: null };
+}
+function saveState() {
+  localStorage.setItem('mtm_state', JSON.stringify(state));
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+function init() {
+  updateHeaderDate();
+  runMidnightCheck();
+  renderSidebars();
+  renderToday();
+  renderCalendar();
+  renderGoals();
+  setInterval(runMidnightCheck, 60000);
+  // Set default date inputs
+  const today = dateKey(new Date());
+  const di = document.getElementById('start-date');
+  if (di) di.value = today;
+}
+
+function dateKey(d) {
+  return d.toISOString().split('T')[0];
+}
+function todayKey() { return dateKey(new Date()); }
+
+// ============================================================
+//  MIDNIGHT CHECK — auto-mark incomplete
+// ============================================================
+function runMidnightCheck() {
+  const today = todayKey();
+  if (state.lastMidnightCheck === today) return;
+  // Mark all pending tasks from past days as missed
+  for (const [day, tasks] of Object.entries(state.tasks)) {
+    if (day >= today) continue;
+    tasks.forEach(t => {
+      if (t.status === 'pending') {
+        t.status = 'missed';
+        // Reschedule to next available slot
+        rescheduleVideo(t, today);
+      }
+    });
+  }
+  state.lastMidnightCheck = today;
+  saveState();
+  renderAll();
+}
+
+function rescheduleVideo(missedTask, fromDate) {
+  // Find next empty slot for this playlist
+  const pl = state.playlists.find(p => p.id === missedTask.playlistId);
+  if (!pl) return;
+  // Find future date tasks
+  let checkDate = new Date(fromDate);
+  while (true) {
+    const key = dateKey(checkDate);
+    const dayTasks = state.tasks[key] || [];
+    const plTasks = dayTasks.filter(t => t.playlistId === pl.id);
+    if (plTasks.length < pl.freq) {
+      // Add here
+      if (!state.tasks[key]) state.tasks[key] = [];
+      state.tasks[key].push({
+        id: missedTask.id,
+        playlistId: missedTask.playlistId,
+        videoId: missedTask.videoId,
+        videoTitle: missedTask.videoTitle,
+        videoIndex: missedTask.videoIndex,
+        status: 'pending'
+      });
+      break;
+    }
+    checkDate.setDate(checkDate.getDate() + 1);
+    // Safety limit
+    if (checkDate > new Date(fromDate).setFullYear(new Date().getFullYear() + 2)) break;
+  }
+}
+
+// ============================================================
+//  YOUTUBE API — calls go through /api/youtube (key is hidden server-side)
+// ============================================================
+async function ytFetch(endpoint, params) {
+  const url = `/api/youtube?endpoint=${endpoint}&params=${encodeURIComponent(JSON.stringify(params))}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || `YouTube API error (${res.status})`);
+  }
+  return res.json();
+}
+
+async function fetchPlaylistFromYT(url) {
+  const listId = extractPlaylistId(url);
+  if (!listId) throw new Error('Invalid YouTube playlist URL');
+
+  let videos = [];
+  let pageToken = '';
+  let playlistInfo = null;
+
+  do {
+    const params = { part: 'snippet', playlistId: listId, maxResults: 50 };
+    if (pageToken) params.pageToken = pageToken;
+    const data = await ytFetch('playlistItems', params);
+
+    if (!playlistInfo) {
+      const pData = await ytFetch('playlists', { part: 'snippet', id: listId });
+      const pl = pData.items?.[0]?.snippet;
+      playlistInfo = {
+        title: pl?.title || 'Untitled Playlist',
+        thumbnail: pl?.thumbnails?.medium?.url || pl?.thumbnails?.default?.url || '',
+        channelTitle: pl?.channelTitle || ''
+      };
+    }
+
+    data.items?.forEach(item => {
+      const s = item.snippet;
+      if (s.resourceId?.kind === 'youtube#video') {
+        videos.push({
+          videoId: s.resourceId.videoId,
+          title: s.title,
+          thumbnail: s.thumbnails?.medium?.url || s.thumbnails?.default?.url || '',
+          index: videos.length
+        });
+      }
+    });
+    pageToken = data.nextPageToken || '';
+  } while (pageToken);
+
+  return { listId, ...playlistInfo, videos };
+}
+
+function extractPlaylistId(url) {
+  try {
+    const u = new URL(url);
+    return u.searchParams.get('list') || null;
+  } catch(e) {
+    const m = url.match(/[?&]list=([^&]+)/);
+    return m ? m[1] : null;
+  }
+}
+
+// ============================================================
+//  SCHEDULE BUILDER
+// ============================================================
+function buildSchedule(videos, freq, startDate) {
+  const schedule = {}; // { 'YYYY-MM-DD': [video, ...] }
+  let dayIdx = 0;
+  let videoIdx = 0;
+  const start = new Date(startDate + 'T00:00:00');
+
+  while (videoIdx < videos.length) {
+    const d = new Date(start);
+    d.setDate(d.getDate() + dayIdx);
+    const key = dateKey(d);
+    schedule[key] = [];
+    for (let i = 0; i < freq && videoIdx < videos.length; i++, videoIdx++) {
+      schedule[key].push(videos[videoIdx]);
+    }
+    dayIdx++;
+  }
+  return schedule;
+}
+
+function applyScheduleToState(playlist, schedule) {
+  for (const [day, videos] of Object.entries(schedule)) {
+    if (!state.tasks[day]) state.tasks[day] = [];
+    videos.forEach(v => {
+      // Check not already scheduled
+      const exists = state.tasks[day].find(t => t.videoId === v.videoId && t.playlistId === playlist.id);
+      if (!exists) {
+        state.tasks[day].push({
+          id: `${playlist.id}_${v.videoId}_${day}`,
+          playlistId: playlist.id,
+          videoId: v.videoId,
+          videoTitle: v.title,
+          videoIndex: v.index,
+          status: 'pending'
+        });
+      }
+    });
+  }
+}
+
+// ============================================================
+//  MODAL FLOW
+// ============================================================
+function openAddModal() {
+  document.getElementById('add-modal').classList.add('open');
+  goStep(1);
+  pendingPlaylist = null;
+  document.getElementById('playlist-url').value = '';
+}
+function closeAddModal() {
+  document.getElementById('add-modal').classList.remove('open');
+}
+
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById(`step${i}`).style.display = i === n ? '' : 'none';
+    const dot = document.getElementById(`step${i}-dot`);
+    dot.classList.remove('active','done');
+    if (i < n) dot.classList.add('done');
+    else if (i === n) dot.classList.add('active');
+  });
+}
+
+async function fetchPlaylist() {
+  const url = document.getElementById('playlist-url').value.trim();
+  if (!url) { toast('Please enter a playlist URL', 'error'); return; }
+  const btn = document.getElementById('fetch-btn');
+  btn.innerHTML = '<span class="inline-loader"></span> Fetching...';
+  btn.disabled = true;
+  try {
+    const data = await fetchPlaylistFromYT(url);
+    pendingPlaylist = data;
+    showPlaylistPreview(data);
+    goStep(2);
+    // Set today as default start
+    document.getElementById('start-date').value = todayKey();
+    document.getElementById('schedule-preview-section').style.display = 'none';
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+  btn.innerHTML = 'Fetch Playlist →';
+  btn.disabled = false;
+}
+
+function showPlaylistPreview(data) {
+  const box = document.getElementById('playlist-preview-box');
+  box.innerHTML = `
+    <img src="${data.thumbnail}" style="width:72px;height:54px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'">
+    <div>
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">${esc(data.title)}</div>
+      <div style="font-size:12px;color:var(--text3)">${esc(data.channelTitle)} · ${data.videos.length} videos</div>
+    </div>
+  `;
+}
+
+function selectFreq(el) {
+  document.querySelectorAll('.freq-selector .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const v = el.dataset.val;
+  const custom = document.getElementById('custom-freq');
+  if (v === 'custom') {
+    custom.style.display = '';
+    selectedFreq = parseInt(custom.value) || 1;
+  } else {
+    custom.style.display = 'none';
+    selectedFreq = parseInt(v);
+  }
+  document.getElementById('schedule-preview-section').style.display = 'none';
+}
+
+function previewSchedule() {
+  const customInput = document.getElementById('custom-freq');
+  const selectedChip = document.querySelector('.freq-selector .chip.selected');
+  if (selectedChip?.dataset.val === 'custom') {
+    selectedFreq = parseInt(customInput.value) || 1;
+  }
+  const startDate = document.getElementById('start-date').value;
+  if (!startDate) { toast('Please pick a start date', 'error'); return; }
+  if (!pendingPlaylist) return;
+
+  const schedule = buildSchedule(pendingPlaylist.videos, selectedFreq, startDate);
+  const entries = Object.entries(schedule).slice(0, 10);
+  const preview = document.getElementById('schedule-preview');
+  preview.innerHTML = entries.map(([day, vids]) => `
+    <div class="vsp-row">
+      <div class="vsp-date">${formatDate(day)}</div>
+      <div class="vsp-vids">${vids.map(v => esc(v.title)).join(', ')}</div>
+    </div>
+  `).join('') + (Object.keys(schedule).length > 10 ? `<div class="vsp-row"><div class="vsp-date" style="color:var(--text3)">+${Object.keys(schedule).length - 10} more days…</div></div>` : '');
+  document.getElementById('schedule-preview-section').style.display = '';
+
+  // Build step 3 summary
+  const totalDays = Object.keys(schedule).length;
+  const endDate = Object.keys(schedule).sort().pop();
+  document.getElementById('schedule-summary').innerHTML = `
+    <div style="font-size:14px;font-weight:600;margin-bottom:12px">Schedule Summary</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
+      <div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Playlist</div><div>${esc(pendingPlaylist.title)}</div></div>
+      <div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Videos</div><div>${pendingPlaylist.videos.length}</div></div>
+      <div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Daily</div><div>${selectedFreq} video${selectedFreq > 1 ? 's' : ''}</div></div>
+      <div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Duration</div><div>${totalDays} days</div></div>
+      <div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Start</div><div>${formatDate(startDate)}</div></div>
+      <div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Finish</div><div>${formatDate(endDate)}</div></div>
+    </div>
+  `;
+  pendingPlaylist._schedule = schedule;
+  pendingPlaylist._freq = selectedFreq;
+  pendingPlaylist._startDate = startDate;
+  goStep(3);
+}
+
+function confirmPlaylist() {
+  if (!pendingPlaylist) return;
+  const exists = state.playlists.find(p => p.id === pendingPlaylist.listId);
+  if (exists) { toast('This playlist is already added', 'error'); return; }
+
+  const pl = {
+    id: pendingPlaylist.listId,
+    title: pendingPlaylist.title,
+    thumbnail: pendingPlaylist.thumbnail,
+    channelTitle: pendingPlaylist.channelTitle,
+    freq: pendingPlaylist._freq,
+    startDate: pendingPlaylist._startDate,
+    videos: pendingPlaylist.videos,
+    addedAt: new Date().toISOString()
+  };
+  state.playlists.push(pl);
+  applyScheduleToState(pl, pendingPlaylist._schedule);
+  saveState();
+  closeAddModal();
+  renderAll();
+  toast(`"${pl.title}" scheduled!`, 'success');
+}
+
+// ============================================================
+//  DELETE PLAYLIST
+// ============================================================
+function deletePlaylist(id) {
+  if (!confirm('Remove this playlist and all its scheduled tasks?')) return;
+  state.playlists = state.playlists.filter(p => p.id !== id);
+  // Remove tasks
+  for (const day of Object.keys(state.tasks)) {
+    state.tasks[day] = state.tasks[day].filter(t => t.playlistId !== id);
+    if (!state.tasks[day].length) delete state.tasks[day];
+  }
+  saveState();
+  renderAll();
+  toast('Playlist removed', 'success');
+}
+
+// ============================================================
+//  TOGGLE TASK
+// ============================================================
+function toggleTask(day, taskId) {
+  const tasks = state.tasks[day];
+  if (!tasks) return;
+  const t = tasks.find(t => t.id === taskId);
+  if (!t) return;
+  if (t.status === 'missed') return; // can't toggle missed
+  t.status = t.status === 'done' ? 'pending' : 'done';
+  saveState();
+  renderAll();
+}
+
+// ============================================================
+//  RENDER ALL
+// ============================================================
+function renderAll() {
+  renderSidebars();
+  renderToday();
+  renderCalendar();
+  renderGoals();
+}
+
+// ============================================================
+//  SIDEBARS
+// ============================================================
+function renderSidebars() {
+  renderSidebarIn('sidebar-playlist-list');
+  renderSidebarIn('cal-sidebar-playlist-list');
+}
+
+function renderSidebarIn(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!state.playlists.length) {
+    el.innerHTML = '<div style="padding:20px;font-size:12px;color:var(--text3);text-align:center">No playlists yet</div>';
+    return;
+  }
+  el.innerHTML = state.playlists.map(pl => {
+    const stats = getPlaylistStats(pl.id);
+    const pct = stats.total ? Math.round(stats.done / stats.total * 100) : 0;
+    return `
+      <div class="playlist-item">
+        <div class="playlist-title">${esc(pl.title)}</div>
+        <div class="playlist-meta">${stats.done}/${stats.total} done · ${pl.freq}/day</div>
+        <div class="playlist-progress-bar"><div class="playlist-progress-fill" style="width:${pct}%"></div></div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button onclick="event.stopPropagation();openChangeFreqModal('${pl.id}')" style="font-size:10px;padding:3px 8px;border-radius:4px;background:var(--surface3);border:1px solid var(--border2);color:var(--text2);cursor:pointer">⚙ freq</button>
+        </div>
+        <button class="del-btn" onclick="event.stopPropagation();deletePlaylist('${pl.id}')" title="Remove">✕</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function getPlaylistStats(plId) {
+  let total = 0, done = 0, missed = 0;
+  for (const tasks of Object.values(state.tasks)) {
+    tasks.filter(t => t.playlistId === plId).forEach(t => {
+      total++;
+      if (t.status === 'done') done++;
+      if (t.status === 'missed') missed++;
+    });
+  }
+  return { total, done, missed, pending: total - done - missed };
+}
+
+// ============================================================
+//  TODAY
+// ============================================================
+function renderToday() {
+  const key = todayKey();
+  const tasks = state.tasks[key] || [];
+  const empty = document.getElementById('today-empty');
+  const main = document.getElementById('today-main');
+
+  if (!state.playlists.length) {
+    empty.style.display = 'flex';
+    main.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  main.style.display = '';
+
+  const done = tasks.filter(t => t.status === 'done').length;
+  const missed = tasks.filter(t => t.status === 'missed').length;
+  const pending = tasks.filter(t => t.status === 'pending').length;
+
+  document.getElementById('today-subtitle').textContent = `${tasks.length} video${tasks.length !== 1 ? 's' : ''} scheduled for today`;
+  document.getElementById('today-stats').innerHTML = `
+    <div class="stat-pill done">${done} done</div>
+    ${pending ? `<div class="stat-pill pending">${pending} pending</div>` : ''}
+    ${missed ? `<div class="stat-pill missed">${missed} missed</div>` : ''}
+  `;
+
+  const container = document.getElementById('today-tasks-container');
+
+  if (!tasks.length) {
+    container.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text3);font-size:13px">No videos scheduled for today.<br>Check back tomorrow!</div>';
+    return;
+  }
+
+  // Group by playlist
+  const byPlaylist = {};
+  tasks.forEach(t => {
+    if (!byPlaylist[t.playlistId]) byPlaylist[t.playlistId] = [];
+    byPlaylist[t.playlistId].push(t);
+  });
+
+  container.innerHTML = Object.entries(byPlaylist).map(([plId, plTasks]) => {
+    const pl = state.playlists.find(p => p.id === plId);
+    const plName = pl ? pl.title : 'Unknown Playlist';
+    return `
+      <div class="section-head" style="display:flex;align-items:center;gap:8px">
+        <span>${esc(plName)}</span>
+        <span class="badge ${plTasks.every(t=>t.status==='done')?'green':'amber'}">${plTasks.filter(t=>t.status==='done').length}/${plTasks.length}</span>
+      </div>
+      ${plTasks.map(t => renderTaskCard(t, key)).join('')}
+    `;
+  }).join('');
+}
+
+function renderTaskCard(t, day) {
+  const ytLink = `https://www.youtube.com/watch?v=${t.videoId}`;
+  const icon = t.status === 'done' ? '✓' : t.status === 'missed' ? '✕' : '';
+  return `
+    <div class="task-card ${t.status}" id="task-${t.id}">
+      <div class="task-row" onclick="toggleTask('${day}','${t.id}')">
+        <div class="task-check">${icon}</div>
+        <div class="task-info">
+          <div class="task-name">${esc(t.videoTitle)}</div>
+          <div class="task-sub">Video #${t.videoIndex + 1}</div>
+        </div>
+        <span class="task-badge">${t.status}</span>
+        <a href="${ytLink}" target="_blank" class="task-link" onclick="event.stopPropagation()" title="Watch on YouTube">▶</a>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+//  CALENDAR
+// ============================================================
+let calYear, calMonth;
+
+function renderCalendar() {
+  const now = calViewDate;
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+  const label = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  document.getElementById('cal-month-label').textContent = label;
+  renderCalCells();
+  if (selectedCalDate) renderCalDayDetail(selectedCalDate);
+}
+
+function renderCalCells() {
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const todayStr = todayKey();
+  const cells = document.getElementById('cal-cells');
+  let html = '';
+
+  // Empty cells before start
+  for (let i = 0; i < firstDay; i++) {
+    html += '<div class="cal-cell empty"></div>';
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const tasks = state.tasks[dateStr] || [];
+    const hasTasks = tasks.length > 0;
+    const hasMissed = tasks.some(t => t.status === 'missed');
+    const allDone = hasTasks && tasks.every(t => t.status === 'done');
+    const isToday = dateStr === todayStr;
+    const isSelected = dateStr === selectedCalDate;
+
+    let cls = 'cal-cell';
+    if (isToday) cls += ' today';
+    if (isSelected) cls += ' selected';
+    if (hasTasks) cls += ' has-tasks';
+    if (hasMissed) cls += ' has-missed';
+    if (allDone) cls += ' all-done';
+
+    html += `<div class="${cls}" onclick="selectCalDate('${dateStr}')">${d}</div>`;
+  }
+  cells.innerHTML = html;
+}
+
+function changeMonth(dir) {
+  calViewDate.setMonth(calViewDate.getMonth() + dir);
+  renderCalendar();
+}
+
+function selectCalDate(dateStr) {
+  selectedCalDate = dateStr;
+  renderCalCells();
+  renderCalDayDetail(dateStr);
+}
+
+function renderCalDayDetail(dateStr) {
+  const tasks = state.tasks[dateStr] || [];
+  const d = new Date(dateStr + 'T00:00:00');
+  document.getElementById('cal-detail-title').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  const el = document.getElementById('cal-detail-tasks');
+  if (!tasks.length) {
+    el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0">No tasks scheduled.</div>';
+    return;
+  }
+
+  el.innerHTML = tasks.map(t => {
+    const pl = state.playlists.find(p => p.id === t.playlistId);
+    const ytLink = `https://www.youtube.com/watch?v=${t.videoId}`;
+    const icon = t.status === 'done' ? '✓' : t.status === 'missed' ? '✕' : '○';
+    const color = t.status === 'done' ? 'var(--accent)' : t.status === 'missed' ? 'var(--red)' : 'var(--text3)';
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="color:${color};font-size:13px;font-weight:600;min-width:16px">${icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.videoTitle)}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">${pl ? esc(pl.title) : ''}</div>
+        </div>
+        <a href="${ytLink}" target="_blank" style="color:var(--text3);text-decoration:none;font-size:14px" title="Watch">▶</a>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================
+//  GOALS
+// ============================================================
+function renderGoals() {
+  const allTasks = Object.values(state.tasks).flat();
+  const today = todayKey();
+  const weekAgo = dateKey(new Date(Date.now() - 6*86400000));
+
+  // Overall stats
+  const totalVideos = allTasks.length;
+  const donePast = allTasks.filter(t => t.status === 'done').length;
+  const weekTasks = Object.entries(state.tasks)
+    .filter(([d]) => d >= weekAgo && d <= today)
+    .flatMap(([,t]) => t);
+  const weekDone = weekTasks.filter(t => t.status === 'done').length;
+  const streak = calcStreak();
+
+  document.getElementById('goals-summary-grid').innerHTML = `
+    <div class="goal-card">
+      <div class="goal-card-title">🎯 Long-term progress</div>
+      <div class="goal-big-num">${donePast}</div>
+      <div class="goal-big-label">videos completed total</div>
+      <div class="goal-bar"><div class="goal-bar-fill" style="width:${totalVideos ? Math.round(donePast/totalVideos*100) : 0}%"></div></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">${totalVideos ? Math.round(donePast/totalVideos*100) : 0}% of all scheduled videos</div>
+    </div>
+    <div class="goal-card">
+      <div class="goal-card-title">📅 This week</div>
+      <div class="goal-big-num">${weekDone}</div>
+      <div class="goal-big-label">videos done in last 7 days</div>
+      <div class="goal-bar"><div class="goal-bar-fill" style="width:${weekTasks.length ? Math.round(weekDone/weekTasks.length*100) : 0}%"></div></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">${weekTasks.length ? Math.round(weekDone/weekTasks.length*100) : 0}% completion rate</div>
+    </div>
+    <div class="goal-card">
+      <div class="goal-card-title">🔥 Current streak</div>
+      <div class="goal-big-num">${streak}</div>
+      <div class="goal-big-label">days in a row completed</div>
+    </div>
+    <div class="goal-card">
+      <div class="goal-card-title">📚 Playlists</div>
+      <div class="goal-big-num">${state.playlists.length}</div>
+      <div class="goal-big-label">active playlists</div>
+    </div>
+  `;
+
+  // Per-playlist details
+  const details = document.getElementById('goals-playlist-details');
+  if (!state.playlists.length) {
+    details.innerHTML = '<div class="empty-state" style="min-height:200px"><div class="empty-icon">📋</div><div class="empty-title" style="font-size:16px">No playlists yet</div></div>';
+    return;
+  }
+  details.innerHTML = state.playlists.map(pl => {
+    const stats = getPlaylistStats(pl.id);
+    const pct = stats.total ? Math.round(stats.done / stats.total * 100) : 0;
+    const endDate = getPlaylistEndDate(pl.id);
+    return `
+      <div class="playlist-detail-card">
+        <div class="playlist-detail-header">
+          <div class="playlist-thumb"><img src="${pl.thumbnail}" alt="" onerror="this.parentElement.style.display='none'"></div>
+          <div>
+            <div class="playlist-detail-title">${esc(pl.title)}</div>
+            <div class="playlist-detail-meta">${esc(pl.channelTitle)} · ${pl.videos.length} videos · ${pl.freq}/day</div>
+          </div>
+        </div>
+        <div class="playlist-detail-body">
+          <div class="two-col">
+            <div class="info-pair"><div class="label">Completed</div><div class="val">${stats.done} <span style="font-size:13px;color:var(--text3)">/ ${stats.total}</span></div></div>
+            <div class="info-pair"><div class="label">Progress</div><div class="val">${pct}%</div></div>
+            <div class="info-pair"><div class="label">Missed</div><div class="val" style="color:${stats.missed?'var(--red)':'var(--text)'}">${stats.missed}</div></div>
+            <div class="info-pair"><div class="label">Finish date</div><div class="val" style="font-size:13px">${endDate || '—'}</div></div>
+          </div>
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function calcStreak() {
+  let streak = 0;
+  let d = new Date();
+  const key = dateKey(d);
+  const todayTasks = state.tasks[key] || [];
+  // Only count today if all done
+  const todayDone = todayTasks.length > 0 && todayTasks.every(t => t.status === 'done');
+  if (!todayDone && todayTasks.length > 0) {
+    d.setDate(d.getDate() - 1);
+  }
+  while (true) {
+    const k = dateKey(d);
+    const tasks = state.tasks[k] || [];
+    if (!tasks.length) break;
+    if (!tasks.every(t => t.status === 'done')) break;
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+function getPlaylistEndDate(plId) {
+  const keys = Object.keys(state.tasks)
+    .filter(k => state.tasks[k].some(t => t.playlistId === plId))
+    .sort();
+  if (!keys.length) return null;
+  return formatDate(keys[keys.length - 1]);
+}
+
+// ============================================================
+//  NAVIGATION
+// ============================================================
+function switchPage(name) {
+  currentPage = name;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  document.querySelector(`.nav-tab[onclick="switchPage('${name}')"]`).classList.add('active');
+  if (name === 'calendar') renderCalendar();
+  if (name === 'goals') renderGoals();
+}
+
+// ============================================================
+//  HELPERS
+// ============================================================
+function esc(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function updateHeaderDate() {
+  const now = new Date();
+  document.getElementById('header-day-name').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
+  document.getElementById('header-full-date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function toast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<div class="toast-dot"></div><span>${esc(msg)}</span>`;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ============================================================
+//  EXPORT / IMPORT
+// ============================================================
+function exportData() {
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    ...state
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `monkey-the-monk-backup-${todayKey()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Data exported!', 'success');
+}
+
+function importData() {
+  document.getElementById('import-file-input').click();
+}
+
+function handleImportFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!data.playlists || !data.tasks) throw new Error('Invalid backup file');
+      if (!confirm(`This will replace ALL your current data with the backup from ${data.exportedAt ? new Date(data.exportedAt).toLocaleDateString() : 'unknown date'}. Continue?`)) return;
+      state.playlists = data.playlists || [];
+      state.tasks = data.tasks || {};
+      state.lastMidnightCheck = data.lastMidnightCheck || null;
+      saveState();
+      renderAll();
+      toast('Data imported successfully!', 'success');
+    } catch(err) {
+      toast('Failed to import: ' + err.message, 'error');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ============================================================
+//  CHANGE FREQUENCY MODAL
+// ============================================================
+let freqModalPlaylistId = null;
+let freqModalNewFreq = 1;
+
+function openChangeFreqModal(plId) {
+  freqModalPlaylistId = plId;
+  const pl = state.playlists.find(p => p.id === plId);
+  if (!pl) return;
+  document.getElementById('freq-modal').classList.add('open');
+  document.getElementById('freq-modal-playlist-info').innerHTML =
+    `<strong>${esc(pl.title)}</strong><br>Current: ${pl.freq} video${pl.freq > 1 ? 's' : ''}/day · ${pl.videos.length} total videos`;
+  // Pre-select current freq chip
+  document.querySelectorAll('#freq-modal-chips .chip').forEach(c => {
+    c.classList.remove('selected');
+    if (parseInt(c.dataset.val) === pl.freq) c.classList.add('selected');
+  });
+  freqModalNewFreq = pl.freq;
+  document.getElementById('freq-modal-custom').style.display = 'none';
+  document.getElementById('freq-modal-custom').value = '';
+}
+
+function closeFreqModal() {
+  document.getElementById('freq-modal').classList.remove('open');
+  freqModalPlaylistId = null;
+}
+
+function selectModalFreq(el) {
+  document.querySelectorAll('#freq-modal-chips .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const v = el.dataset.val;
+  const custom = document.getElementById('freq-modal-custom');
+  if (v === 'custom') {
+    custom.style.display = '';
+    freqModalNewFreq = parseInt(custom.value) || 1;
+  } else {
+    custom.style.display = 'none';
+    freqModalNewFreq = parseInt(v);
+  }
+}
+
+function applyFreqChange() {
+  const customInput = document.getElementById('freq-modal-custom');
+  const selectedChip = document.querySelector('#freq-modal-chips .chip.selected');
+  if (selectedChip?.dataset.val === 'custom') {
+    freqModalNewFreq = parseInt(customInput.value) || 1;
+  }
+  if (!freqModalNewFreq || freqModalNewFreq < 1) { toast('Please select a valid frequency', 'error'); return; }
+
+  const pl = state.playlists.find(p => p.id === freqModalPlaylistId);
+  if (!pl) return;
+
+  // Update freq on playlist
+  pl.freq = freqModalNewFreq;
+
+  // Remove all pending (not done/missed) tasks for this playlist from today onwards
+  const today = todayKey();
+  for (const day of Object.keys(state.tasks)) {
+    if (day < today) continue;
+    state.tasks[day] = state.tasks[day].filter(t => t.playlistId !== pl.id || t.status !== 'pending');
+    if (!state.tasks[day].length) delete state.tasks[day];
+  }
+
+  // Find which videos are already done or missed (don't reschedule those)
+  const completedVideoIds = new Set();
+  for (const tasks of Object.values(state.tasks)) {
+    tasks.filter(t => t.playlistId === pl.id && (t.status === 'done' || t.status === 'missed'))
+      .forEach(t => completedVideoIds.add(t.videoId));
+  }
+
+  // Rebuild schedule for remaining videos from today
+  const remainingVideos = pl.videos.filter(v => !completedVideoIds.has(v.videoId));
+  if (remainingVideos.length) {
+    const newSchedule = buildSchedule(remainingVideos, freqModalNewFreq, today);
+    applyScheduleToState(pl, newSchedule);
+  }
+
+  saveState();
+  closeFreqModal();
+  renderAll();
+  toast(`Frequency updated to ${freqModalNewFreq}/day. Schedule rebuilt!`, 'success');
+}
+
+// ============================================================
+//  START
+// ============================================================
+init();
+</script>
+</body>
+</html>
