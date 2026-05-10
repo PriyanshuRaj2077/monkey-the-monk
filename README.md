@@ -18,7 +18,7 @@ A personal YouTube playlist scheduler that turns your saved playlists into a str
 
 ## Tech Stack
 
-- Pure HTML, CSS, JavaScript
+- Pure HTML
 - YouTube Data API v3
 - Vercel Serverless Functions (to keep API key hidden)
 - localStorage for data persistence
