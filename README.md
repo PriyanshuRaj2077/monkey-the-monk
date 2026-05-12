@@ -1,12 +1,28 @@
 # 🐒 Monkey the Monk
 
 ![MIT License](https://img.shields.io/badge/MIT-License-c8f04a?style=for-the-badge&labelColor=111111)
+![Status](https://img.shields.io/badge/status-active-c8f04a?style=for-the-badge&labelColor=111111)
 
 > From distracted watching to structured learning.
 
 Monkey the Monk is a minimalist productivity and learning system that transforms YouTube playlists into structured daily tasks.
 
 Built for learners who save hundreds of tutorials but struggle to stay consistent.
+
+Monkey the Monk focuses on:
+- structured learning,
+- consistency over intensity,
+- and distraction-free progress.
+
+---
+
+🌐 Live Demo: https://monkeythemonk.vercel.app/
+
+---
+
+## 📸 Preview
+
+![Monkey the Monk Preview](./assets/preview.png)
 
 ---
 
@@ -30,12 +46,22 @@ Built for learners who save hundreds of tutorials but struggle to stay consisten
 
 ## 🛠 Tech Stack
 
+**Frontend**
 - HTML
 - CSS
 - Vanilla JavaScript
-- YouTube Data API v3
+
+**Backend**
 - Vercel Serverless Functions
+
+**APIs & Storage**
+- YouTube Data API v3
 - localStorage
+
+---
+## ⚡ Architecture
+
+The frontend communicates with a Vercel serverless API route which securely proxies requests to the YouTube Data API, preventing exposure of API keys on the client side.
 
 ---
 
@@ -69,6 +95,7 @@ Add the following variable in Vercel:
 
 ```env
 YOUTUBE_API_KEY=your_api_key
+
 ```
 
 ### 3. Deploy
