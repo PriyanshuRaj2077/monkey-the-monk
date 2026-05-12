@@ -1,35 +1,98 @@
 # 🐒 Monkey the Monk
 
-> From monkey to monk, one video a day.
+![License](https://img.shields.io/badge/License-MIT_c8f04a?style=for-the-badge&labelColor=111111&color=c8f04a)
 
-A personal YouTube playlist scheduler that turns your saved playlists into a structured daily learning routine. Add any YouTube playlist, set how many videos you want to watch per day, and the app builds your schedule automatically.
+> From distracted watching to structured learning.
 
-## Features
+Monkey the Monk is a minimalist productivity and learning system that transforms YouTube playlists into structured daily tasks.
 
-- Add multiple YouTube playlists
-- Set daily video frequency per playlist
-- Auto-assigns videos to calendar days
-- Daily checklist to tick off completed videos
-- Missed videos auto-reschedule to the next day at midnight
-- Calendar view to see your full schedule
-- Goals page with streak, weekly and long-term progress
-- Export and import your data to migrate between browsers
-- Everything saved locally — no login, no database
+Built for learners who save hundreds of tutorials but struggle to stay consistent.
 
-## Tech Stack
+---
 
-- Pure HTML
+## ✨ Features
+
+- YouTube playlist scheduling
+- Daily learning task generation
+- Custom videos-per-day targets
+- Start scheduling from any video in a playlist
+- Built-in Pomodoro focus mode
+- Separate to-do task system
+- Weekly progress review
+- Calendar-based planning
+- Missed task auto-rescheduling
+- Dark / Light theme
+- Mobile-friendly Android UI
+- Export / Import support
+- Fully local-first experience
+
+---
+
+## 🛠 Tech Stack
+
+- HTML
+- CSS
+- Vanilla JavaScript
 - YouTube Data API v3
-- Vercel Serverless Functions (to keep API key hidden)
-- localStorage for data persistence
+- Vercel Serverless Functions
+- localStorage
 
-## Setup
+---
 
-1. Clone the repo
-2. Add your YouTube Data API v3 key to Vercel environment variables as `YOUTUBE_API_KEY`
-3. Deploy to Vercel
-4. Open the app and start adding playlists
+## 📂 Project Structure
 
-## Why the name?
+```text
+MonkeyTheMonk/
+│
+├── api/
+│   └── youtube.js
+│
+├── LICENSE
+├── README.md
+├── index.html
+└── vercel.json
+```
 
-Students are generally monkeys — distracted, jumping between videos, no structure. This app turns them into monks — focused, one video at a time, every single day.
+---
+
+## 🚀 Setup
+
+### 1. Clone the repository
+
+```bash
+git clone <your-repository-url>
+```
+
+### 2. Configure environment variables
+
+Add the following variable in Vercel:
+
+```env
+YOUTUBE_API_KEY=your_api_key
+```
+
+### 3. Deploy
+
+Deploy the project using Vercel.
+
+---
+
+## 🧠 Philosophy
+
+Most learners consume content endlessly without structure.
+
+Monkey the Monk focuses on:
+- consistency,
+- focused learning,
+- and sustainable daily progress.
+
+> One playlist. One task. One focused session at a time.
+
+---
+
+## 🔒 Privacy
+
+- No authentication
+- No external database
+- All data stored locally using `localStorage`
+- API key protected through serverless backend functions
