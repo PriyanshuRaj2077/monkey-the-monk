@@ -2,16 +2,17 @@
 
 ![MIT License](https://img.shields.io/badge/MIT-License-c8f04a?style=for-the-badge&labelColor=111111)
 
+## 🐒 Why the Name?
+
+Students are generally monkeys — distracted, jumping between videos, and learning without structure.
+
+Monkey the Monk is built around the idea of transforming chaotic consumption into focused, consistent progress — one video, one task, and one session at a time.
+
 > From distracted watching to structured learning.
 
 Monkey the Monk is a minimalist productivity and learning system that transforms YouTube playlists into structured daily tasks.
 
 Built for learners who save hundreds of tutorials but struggle to stay consistent.
-
-Monkey the Monk focuses on:
-- structured learning,
-- consistency over intensity,
-- and distraction-free progress.
 
 ---
 
