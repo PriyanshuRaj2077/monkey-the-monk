@@ -1,6 +1,6 @@
 # 🐒 Monkey the Monk
 
-![License](https://img.shields.io/badge/License-MIT_c8f04a?style=for-the-badge&labelColor=111111&color=c8f04a)
+![MIT License](https://img.shields.io/badge/MIT-License-c8f04a?style=for-the-badge&labelColor=111111)
 
 > From distracted watching to structured learning.
 
