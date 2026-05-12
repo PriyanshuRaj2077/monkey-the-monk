@@ -2,7 +2,7 @@
 
 ![MIT License](https://img.shields.io/badge/MIT-License-c8f04a?style=for-the-badge&labelColor=111111)
 
-## 🐒 Why the Name?
+##  Why the Name?
 
 Students are generally monkeys — distracted, jumping between videos, and learning without structure.
 
