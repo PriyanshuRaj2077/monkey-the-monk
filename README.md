@@ -4,7 +4,7 @@
 
 ##  Why the Name?
 
-Students are generally monkeys — distracted, jumping between videos, and learning without structure.
+Students are generally monkeys — distracted, jumping between videos, no structure. This app turns them into monks — focused, one video at a time, every single day.
 
 > From distracted watching to structured learning.
 
