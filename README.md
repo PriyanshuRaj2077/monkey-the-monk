@@ -1,4 +1,4 @@
-# 🐒 Monkey the Mon
+# 🐒 Monkey the Monk
 
 ![MIT License](https://img.shields.io/badge/MIT-License-c8f04a?style=for-the-badge&labelColor=111111)
 
